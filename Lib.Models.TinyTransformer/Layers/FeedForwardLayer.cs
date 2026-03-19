@@ -1,9 +1,57 @@
-﻿namespace Lib.Models.TinyTransformer.Layers;
+﻿using Lib.Models.TinyTransformer.Enums;
+using Lib.Models.TinyTransformer.State;
+
+namespace Lib.Models.TinyTransformer.Layers;
 
 public class FeedForwardLayer
 {
+    public static TinyTransformerWeights Weights = new();
+
     public static double[] Project(double[] hidden)
     {
-        return null;
+        double[][] hiddenHelper = new double[1][];
+        hiddenHelper[0] = hidden;
+
+        double[][] firstLinear = Linear(hiddenHelper, LinearAction.Expanse);
+        Relu(firstLinear[0]);
+        double[][] secondLinear =  Linear(firstLinear, LinearAction.Compress);
+
+        double[][]  thirdLinear = Linear(secondLinear, LinearAction.Vocab);
+
+        return thirdLinear[0];
+    }
+
+    public static double[][] Linear(double[][] matrix, LinearAction linear)
+    {
+        switch (linear)
+        {
+            case LinearAction.Expanse: 
+                var firstLinear = MatrixHelper.MultiplyMatrix(matrix, Weights.ffn1);
+                MatrixHelper.LineSumm(firstLinear[0], Weights.ffn1Bias);
+                return firstLinear;
+                
+            case LinearAction.Compress: 
+                var secondLinear = MatrixHelper.MultiplyMatrix(matrix, Weights.ffn2);
+                MatrixHelper.LineSumm(secondLinear[0], Weights.ffn2Bias);
+                return secondLinear;
+            
+            case LinearAction.Vocab:
+                var thirdLinear = MatrixHelper.MultiplyMatrix(matrix, Weights.OutputW);
+                MatrixHelper.LineSumm(thirdLinear[0], Weights.OutputBias);
+                return thirdLinear;
+            
+            default: throw new NotImplementedException();
+        }
+    }
+
+    public static void Relu(double[] array)
+    {
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (array[i] < 0)
+            {
+                array[i] = 0;
+            }
+        }
     }
 }

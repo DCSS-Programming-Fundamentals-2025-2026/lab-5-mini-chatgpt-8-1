@@ -8,10 +8,8 @@ namespace Lib.Models.TinyTransformer.Layers;
 
 public class SelfAttentionLayer
 {
-    public static TinyTransformerWeights weights;
-    public static TinyTransformerConfig config;
-    
-    public static MathOpsImpl mathOps = new MathOpsImpl();
+    public static TinyTransformerWeights Weights = new();
+    public static MathOpsImpl MathOps = new ();
     
     public static double[] Compute(int[] context)
     {
@@ -24,7 +22,7 @@ public class SelfAttentionLayer
         double[][] V = InitMatrix(x, QKV.V);
         
         //step 3
-        double[][] scores = MultiplyMatrix(Q, TransposeMatrix(K));
+        double[][] scores = MatrixHelper.MultiplyMatrix(Q, MatrixHelper.TransposeMatrix(K));
         EachElementDivideBySquareRootOfEmbeddingSizeWithMask(scores);
         
         //step 4
@@ -34,16 +32,15 @@ public class SelfAttentionLayer
         double[][] outMatrix = WeightedSum(attn, V);
         
         //step 6
-        double[][] proj = MultiplyMatrix(outMatrix, weights.wO);
+        double[][] proj = MatrixHelper.MultiplyMatrix(outMatrix, Weights.wO);
 
         //step 7
         return proj[proj.Length - 1];
     }
 
-
     public static double[][] InitXmatrix(int[] context)
     {
-        double[][] x = new double[context.Length > config.ContextSize ? config.ContextSize : context.Length][];
+        double[][] x = new double[context.Length > TinyTransformerConfig.ContextSize ? TinyTransformerConfig.ContextSize : context.Length][];
 
         if (context.Length > 8)
         {
@@ -52,7 +49,7 @@ public class SelfAttentionLayer
 
         for (int i = 0; i < x.Length; i++)
         {
-            x[i] = config.TokenEmbeddings[context[i]];
+            x[i] = TinyTransformerConfig.TokenEmbeddings[context[i]];
         }
 
         return x;
@@ -63,44 +60,14 @@ public class SelfAttentionLayer
         switch (qkv)
         {
             case QKV.K:
-                return MultiplyMatrix(x, weights.wK);
+                return MatrixHelper.MultiplyMatrix(x, Weights.wK);
             case QKV.Q:
-                return MultiplyMatrix(x, weights.wQ);
+                return MatrixHelper.MultiplyMatrix(x, Weights.wQ);
             case QKV.V:
-                return MultiplyMatrix(x, weights.wV);
+                return MatrixHelper.MultiplyMatrix(x, Weights.wV);
             default:
                 throw new ArgumentOutOfRangeException(nameof(qkv), qkv, null);
         }
-    }
-
-    public static double[][] MultiplyMatrix(double[][] matrix, double[][] weights)
-    {
-
-        if (matrix[0].Length != weights.Length)
-        {
-            throw new ArgumentException("Matrix dimensions do not match");
-        }
-        
-        double[][] res = new double[matrix.Length][];
-
-        for (int i = 0; i < res.Length; i++)
-        {
-            res[i] = new double[weights[0].Length];
-
-            for (int j = 0; j < res[i].Length; j++)
-            {
-                double sum = 0;
-
-                for (int k = 0; k < matrix.Length; k++)
-                {
-                   sum += matrix[i][k] * weights[k][j];
-                }
-                
-                res[i][j] = sum;
-            }
-        }
-
-        return res;
     }
     
     public static void EachElementDivideBySquareRootOfEmbeddingSizeWithMask(double[][] matrix)
@@ -111,7 +78,7 @@ public class SelfAttentionLayer
             {
                 if (j <= i)
                 {
-                    matrix[i][j] /= Math.Sqrt(config.EmbeddingSize);
+                    matrix[i][j] /= Math.Sqrt(TinyTransformerConfig.EmbeddingSize);
                     continue;
                 }
 
@@ -126,24 +93,7 @@ public class SelfAttentionLayer
         
         for (int i = 0; i < matrix.Length; i++)
         {
-            res[i] = mathOps.Softmax(matrix[i]);
-        }
-
-        return res;
-    }
-    
-    public static double[][] TransposeMatrix(double[][] matrix)
-    {
-        double[][] res = new double[matrix.GetLength(1)][];
-
-        for (int i = 0; i < res.Length; i++)
-        {
-            res[i] = new double[matrix.GetLength(0)];
-
-            for (int j = 0; j < res[i].Length; j++)
-            {
-                res[i][j] = matrix[j][i];
-            }
+            res[i] = MathOps.Softmax(matrix[i]);
         }
 
         return res;
@@ -155,14 +105,14 @@ public class SelfAttentionLayer
         
         for (int i = 0; i < attn.Length; i++) 
         {
-            double[] sumVector = new double[config.EmbeddingSize];
+            double[] sumVector = new double[TinyTransformerConfig.EmbeddingSize];
             
             for (int j = 0; j < attn[i].Length; j++) 
             {
                 double weight = attn[i][j];
                 double[] valueVect = V[j];
         
-                for (int k = 0; k < config.EmbeddingSize; k++) 
+                for (int k = 0; k < TinyTransformerConfig.EmbeddingSize; k++) 
                 {
                     sumVector[k] += weight * valueVect[k];
                 }
