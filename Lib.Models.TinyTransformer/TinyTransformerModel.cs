@@ -7,6 +7,6 @@ public class TinyTransformerModel
 {
     public double[] NextTokenScores(int[] context)
     {
-        return TransformerBlock.Forward(context, TinyTransformerConfig.VocabSize, TinyTransformerConfig.EmbeddingSize);
+        return TransformerBlock.Forward(context);
     }
 }

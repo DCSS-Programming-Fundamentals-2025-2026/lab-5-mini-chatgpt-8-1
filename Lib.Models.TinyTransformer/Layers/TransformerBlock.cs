@@ -5,8 +5,8 @@ namespace Lib.Models.TinyTransformer.Layers;
 
 public class TransformerBlock
 {
-    public static double[] Forward(int[] context, int vocabSize, int embeddingSize)
+    public static double[] Forward(int[] context)
     {
-        return FeedForwardLayer.Project(SelfAttentionLayer.Compute(context, embeddingSize), vocabSize);
+        return FeedForwardLayer.Project(SelfAttentionLayer.Compute(context));
     }
 }

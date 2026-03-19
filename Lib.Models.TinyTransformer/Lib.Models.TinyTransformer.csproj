@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Downloads\Lib.MathCore\Lib.MathCore.csproj" />
+      <ProjectReference Include="..\Lib.MathCore\Lib.MathCore.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -2,7 +2,7 @@
 
 public class FeedForwardLayer
 {
-    public static double[] Project(double[][] hidden, int vocabSize)
+    public static double[] Project(double[] hidden)
     {
         return null;
     }
