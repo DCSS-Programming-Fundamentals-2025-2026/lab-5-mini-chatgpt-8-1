@@ -34,11 +34,11 @@ public class MatrixHelper
     
     public static double[][] TransposeMatrix(double[][] matrix)
     {
-        double[][] res = new double[matrix.GetLength(1)][];
+        double[][] res = new double[matrix[0].Length][];
 
         for (int i = 0; i < res.Length; i++)
         {
-            res[i] = new double[matrix.GetLength(0)];
+            res[i] = new double[matrix.Length];
 
             for (int j = 0; j < res[i].Length; j++)
             {

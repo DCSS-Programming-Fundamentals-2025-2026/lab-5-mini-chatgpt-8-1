@@ -10,7 +10,7 @@ public class TinyTransformerWeights
     public double[][] wK = GenerateMatrix(TinyTransformerConfig.EmbeddingSize, TinyTransformerConfig.EmbeddingSize);
     public double[][] wV = GenerateMatrix(TinyTransformerConfig.EmbeddingSize, TinyTransformerConfig.EmbeddingSize);
     public double[][] wO = GenerateMatrix(TinyTransformerConfig.EmbeddingSize, TinyTransformerConfig.EmbeddingSize);
-    public double[][] OutputW =  GenerateMatrix(TinyTransformerConfig.EmbeddingSize, TinyTransformerConfig.EmbeddingSize);
+    public double[][] OutputW =  GenerateMatrix(TinyTransformerConfig.EmbeddingSize, TinyTransformerConfig.VocabSize);
     public double[][] ffn1 = GenerateMatrix(TinyTransformerConfig.EmbeddingSize, TinyTransformerConfig.EmbeddingSize*4);
     public double[][] ffn2 = GenerateMatrix(TinyTransformerConfig.EmbeddingSize*4, TinyTransformerConfig.EmbeddingSize);
     public double[] ffn1Bias = new double[TinyTransformerConfig.EmbeddingSize*4];

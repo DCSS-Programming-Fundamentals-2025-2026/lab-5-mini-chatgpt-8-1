@@ -122,5 +122,4 @@ public class SelfAttentionLayer
         
         return res;
     }
-
 }
