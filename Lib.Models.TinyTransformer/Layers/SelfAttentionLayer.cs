@@ -8,10 +8,14 @@ namespace Lib.Models.TinyTransformer.Layers;
 
 public class SelfAttentionLayer
 {
-    public static TinyTransformerWeights Weights = new();
-    public static MathOpsImpl MathOps = new ();
+    private readonly TinyTransformerConfig _config;
+    private readonly MathOpsImpl MathOps = new ();
+    public SelfAttentionLayer(TinyTransformerConfig config)
+    {
+        _config = config;
+    }
     
-    public static double[] Compute(int[] context)
+    public double[] Compute(int[] context)
     {
         //step 1
         double[][] x = InitXmatrix(context);
@@ -32,15 +36,15 @@ public class SelfAttentionLayer
         double[][] outMatrix = WeightedSum(attn, V);
         
         //step 6
-        double[][] proj = MatrixHelper.MultiplyMatrix(outMatrix, Weights.wO);
+        double[][] proj = MatrixHelper.MultiplyMatrix(outMatrix, _config.Weights.wO);
 
         //step 7
         return proj[proj.Length - 1];
     }
 
-    public static double[][] InitXmatrix(int[] context)
+    public double[][] InitXmatrix(int[] context)
     {
-        double[][] x = new double[context.Length > TinyTransformerConfig.ContextSize ? TinyTransformerConfig.ContextSize : context.Length][];
+        double[][] x = new double[context.Length > _config.ContextSize ? _config.ContextSize : context.Length][];
 
         if (context.Length > 8)
         {
@@ -49,28 +53,28 @@ public class SelfAttentionLayer
 
         for (int i = 0; i < x.Length; i++)
         {
-            x[i] = TinyTransformerConfig.TokenEmbeddings[context[i]];
+            x[i] = _config.TokenEmbeddings[context[i]];
         }
 
         return x;
     }
     
-    public static double[][] InitMatrix(double[][] x, QKV qkv)
+    public double[][] InitMatrix(double[][] x, QKV qkv)
     {
         switch (qkv)
         {
             case QKV.K:
-                return MatrixHelper.MultiplyMatrix(x, Weights.wK);
+                return MatrixHelper.MultiplyMatrix(x, _config.Weights.wK);
             case QKV.Q:
-                return MatrixHelper.MultiplyMatrix(x, Weights.wQ);
+                return MatrixHelper.MultiplyMatrix(x, _config.Weights.wQ);
             case QKV.V:
-                return MatrixHelper.MultiplyMatrix(x, Weights.wV);
+                return MatrixHelper.MultiplyMatrix(x, _config.Weights.wV);
             default:
                 throw new ArgumentOutOfRangeException(nameof(qkv), qkv, null);
         }
     }
     
-    public static void EachElementDivideBySquareRootOfEmbeddingSizeWithMask(double[][] matrix)
+    public void EachElementDivideBySquareRootOfEmbeddingSizeWithMask(double[][] matrix)
     {
         for (int i = 0; i < matrix.Length; i++)
         {
@@ -78,7 +82,7 @@ public class SelfAttentionLayer
             {
                 if (j <= i)
                 {
-                    matrix[i][j] /= Math.Sqrt(TinyTransformerConfig.EmbeddingSize);
+                    matrix[i][j] /= Math.Sqrt(_config.EmbeddingSize);
                     continue;
                 }
 
@@ -87,7 +91,7 @@ public class SelfAttentionLayer
         }
     }
     
-    public static double[][] SoftmaxEachRow(double[][] matrix)
+    public double[][] SoftmaxEachRow(double[][] matrix)
     {
         double[][] res = new double[matrix.Length][];
         
@@ -99,20 +103,20 @@ public class SelfAttentionLayer
         return res;
     }
     
-    public static double[][] WeightedSum(double[][] attn, double[][] V)
+    public double[][] WeightedSum(double[][] attn, double[][] V)
     {
         double[][] res = new double[attn.Length][];
         
         for (int i = 0; i < attn.Length; i++) 
         {
-            double[] sumVector = new double[TinyTransformerConfig.EmbeddingSize];
+            double[] sumVector = new double[_config.EmbeddingSize];
             
             for (int j = 0; j < attn[i].Length; j++) 
             {
                 double weight = attn[i][j];
                 double[] valueVect = V[j];
         
-                for (int k = 0; k < TinyTransformerConfig.EmbeddingSize; k++) 
+                for (int k = 0; k < _config.EmbeddingSize; k++) 
                 {
                     sumVector[k] += weight * valueVect[k];
                 }

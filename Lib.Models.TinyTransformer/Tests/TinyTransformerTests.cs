@@ -1,5 +1,6 @@
 ﻿using Lib.Models.TinyTransformer.Configuration;
 using Lib.Models.TinyTransformer.Enums;
+using Lib.Models.TinyTransformer.Factories;
 using Lib.Models.TinyTransformer.Layers;
 using NUnit.Framework;
 
@@ -8,10 +9,13 @@ namespace Lib.Models.TinyTransformer.Tests;
 [TestFixture]
 public class TinyTransformerTests
 {
+    public TinyTransformerConfig config;
+    public SelfAttentionLayer selfAttentionLayer;
+    public FeedForwardLayer feedForwardLayer;
     [SetUp]
     public void Setup()
     {
-        TinyTransformerConfig.TokenEmbeddings = new double[][]
+        double[][] tokenEmbeddings = new double[][]
         {
             new double[]
             {
@@ -30,7 +34,13 @@ public class TinyTransformerTests
             }
         };
 
-        TinyTransformerConfig config = new(TinyTransformerConfig.TokenEmbeddings.Length);
+        config = new(tokenEmbeddings.Length)
+        {
+            TokenEmbeddings = tokenEmbeddings
+        };
+        
+        selfAttentionLayer = new SelfAttentionLayer(config);
+        feedForwardLayer = new FeedForwardLayer(config);
     }
 
     [TestCase(new[] { 0, 2, 1 })]
@@ -38,16 +48,16 @@ public class TinyTransformerTests
     [TestCase(new[] { 1, 0, 2 })]
     public void Test_Softmax_SumIsOne(int[] context)
     {
-        double[][] x = SelfAttentionLayer.InitXmatrix(context);
+        double[][] x = selfAttentionLayer.InitXmatrix(context);
 
-        double[][] Q = SelfAttentionLayer.InitMatrix(x, QKV.Q);
-        double[][] K = SelfAttentionLayer.InitMatrix(x, QKV.K);
-        double[][] V = SelfAttentionLayer.InitMatrix(x, QKV.V);
+        double[][] Q = selfAttentionLayer.InitMatrix(x, QKV.Q);
+        double[][] K = selfAttentionLayer.InitMatrix(x, QKV.K);
+        double[][] V = selfAttentionLayer.InitMatrix(x, QKV.V);
 
         double[][] scores = MatrixHelper.MultiplyMatrix(Q, MatrixHelper.TransposeMatrix(K));
-        SelfAttentionLayer.EachElementDivideBySquareRootOfEmbeddingSizeWithMask(scores);
+        selfAttentionLayer.EachElementDivideBySquareRootOfEmbeddingSizeWithMask(scores);
 
-        double[][] attn = SelfAttentionLayer.SoftmaxEachRow(scores);
+        double[][] attn = selfAttentionLayer.SoftmaxEachRow(scores);
 
         for (int i = 0; i < attn.Length; i++)
         {
