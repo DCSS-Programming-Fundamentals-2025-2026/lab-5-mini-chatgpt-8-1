@@ -1,45 +1,51 @@
-﻿using Lib.Models.TinyTransformer.Enums;
+﻿using Lib.Models.TinyTransformer.Configuration;
+using Lib.Models.TinyTransformer.Enums;
 using Lib.Models.TinyTransformer.State;
 
 namespace Lib.Models.TinyTransformer.Layers;
 
 public class FeedForwardLayer
 {
-    public static TinyTransformerWeights Weights = new();
+    private readonly TinyTransformerConfig _config;
 
-    public static double[] Project(double[] hidden)
+    public FeedForwardLayer(TinyTransformerConfig config)
+    {
+        _config = config;
+    }
+
+    public double[] Project(double[] hidden)
     {
         double[][] hiddenHelper = new double[1][];
         hiddenHelper[0] = hidden;
 
         double[][] firstLinear = Linear(hiddenHelper, LinearAction.Expanse);
         Relu(firstLinear[0]);
-        double[][] secondLinear =  Linear(firstLinear, LinearAction.Compress);
+        double[][] secondLinear = Linear(firstLinear, LinearAction.Compress);
 
-        double[][]  thirdLinear = Linear(secondLinear, LinearAction.Vocab);
+        double[][] thirdLinear = Linear(secondLinear, LinearAction.Vocab);
 
         return thirdLinear[0];
     }
 
-    public static double[][] Linear(double[][] matrix, LinearAction linear)
+    public double[][] Linear(double[][] matrix, LinearAction linear)
     {
         switch (linear)
         {
-            case LinearAction.Expanse: 
-                var firstLinear = MatrixHelper.MultiplyMatrix(matrix, Weights.ffn1);
-                MatrixHelper.LineSumm(firstLinear[0], Weights.ffn1Bias);
+            case LinearAction.Expanse:
+                var firstLinear = MatrixHelper.MultiplyMatrix(matrix, _config.Weights.ffn1);
+                MatrixHelper.LineSumm(firstLinear[0], _config.Weights.ffn1Bias);
                 return firstLinear;
-                
-            case LinearAction.Compress: 
-                var secondLinear = MatrixHelper.MultiplyMatrix(matrix, Weights.ffn2);
-                MatrixHelper.LineSumm(secondLinear[0], Weights.ffn2Bias);
+
+            case LinearAction.Compress:
+                var secondLinear = MatrixHelper.MultiplyMatrix(matrix, _config.Weights.ffn2);
+                MatrixHelper.LineSumm(secondLinear[0], _config.Weights.ffn2Bias);
                 return secondLinear;
-            
+
             case LinearAction.Vocab:
-                var thirdLinear = MatrixHelper.MultiplyMatrix(matrix, Weights.OutputW);
-                MatrixHelper.LineSumm(thirdLinear[0], Weights.OutputBias);
+                var thirdLinear = MatrixHelper.MultiplyMatrix(matrix, _config.Weights.OutputW);
+                MatrixHelper.LineSumm(thirdLinear[0], _config.Weights.OutputBias);
                 return thirdLinear;
-            
+
             default: throw new NotImplementedException();
         }
     }

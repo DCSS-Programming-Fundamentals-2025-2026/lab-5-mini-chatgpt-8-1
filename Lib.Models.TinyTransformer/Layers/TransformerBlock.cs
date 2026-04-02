@@ -1,12 +1,20 @@
 ﻿using Lib.Models.TinyTransformer.Configuration;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Lib.Models.TinyTransformer.Layers;
 
 public class TransformerBlock
 {
-    public static double[] Forward(int[] context)
+    private readonly TinyTransformerConfig _config;
+    public double[] Forward(int[] context)
     {
-        return FeedForwardLayer.Project(SelfAttentionLayer.Compute(context));
+        SelfAttentionLayer selfAttentionLayer = new SelfAttentionLayer(_config);
+        FeedForwardLayer feedForwardLayer = new FeedForwardLayer(_config);
+        
+        return feedForwardLayer.Project(selfAttentionLayer.Compute(context));
+    }
+
+    public TransformerBlock(TinyTransformerConfig config)
+    {
+        _config = config;
     }
 }
