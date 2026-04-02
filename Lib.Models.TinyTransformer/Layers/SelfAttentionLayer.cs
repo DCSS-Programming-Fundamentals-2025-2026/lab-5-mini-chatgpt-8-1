@@ -15,36 +15,36 @@ public class SelfAttentionLayer
         _config = config;
     }
     
-    public double[] Compute(int[] context)
+    public float[] Compute(int[] context)
     {
         //step 1
-        double[][] x = InitXmatrix(context);
+        float[][] x = InitXmatrix(context);
 
         //step 2
-        double[][] Q = InitMatrix(x, QKV.Q);
-        double[][] K = InitMatrix(x, QKV.K);
-        double[][] V = InitMatrix(x, QKV.V);
+        float[][] Q = InitMatrix(x, QKV.Q);
+        float[][] K = InitMatrix(x, QKV.K);
+        float[][] V = InitMatrix(x, QKV.V);
         
         //step 3
-        double[][] scores = MatrixHelper.MultiplyMatrix(Q, MatrixHelper.TransposeMatrix(K));
+        float[][] scores = MatrixHelper.MultiplyMatrix(Q, MatrixHelper.TransposeMatrix(K));
         EachElementDivideBySquareRootOfEmbeddingSizeWithMask(scores);
         
         //step 4
-        double[][] attn = SoftmaxEachRow(scores);
+        float[][] attn = SoftmaxEachRow(scores);
         
         //step 5
-        double[][] outMatrix = WeightedSum(attn, V);
+        float[][] outMatrix = WeightedSum(attn, V);
         
         //step 6
-        double[][] proj = MatrixHelper.MultiplyMatrix(outMatrix, _config.Weights.wO);
+        float[][] proj = MatrixHelper.MultiplyMatrix(outMatrix, _config.Weights.wO);
 
         //step 7
         return proj[proj.Length - 1];
     }
 
-    public double[][] InitXmatrix(int[] context)
+    public float[][] InitXmatrix(int[] context)
     {
-        double[][] x = new double[context.Length > _config.ContextSize ? _config.ContextSize : context.Length][];
+        float[][] x = new float[context.Length > _config.ContextSize ? _config.ContextSize : context.Length][];
 
         if (context.Length > 8)
         {
@@ -59,7 +59,7 @@ public class SelfAttentionLayer
         return x;
     }
     
-    public double[][] InitMatrix(double[][] x, QKV qkv)
+    public float[][] InitMatrix(float[][] x, QKV qkv)
     {
         switch (qkv)
         {
@@ -74,7 +74,7 @@ public class SelfAttentionLayer
         }
     }
     
-    public void EachElementDivideBySquareRootOfEmbeddingSizeWithMask(double[][] matrix)
+    public void EachElementDivideBySquareRootOfEmbeddingSizeWithMask(float[][] matrix)
     {
         for (int i = 0; i < matrix.Length; i++)
         {
@@ -82,18 +82,18 @@ public class SelfAttentionLayer
             {
                 if (j <= i)
                 {
-                    matrix[i][j] /= Math.Sqrt(_config.EmbeddingSize);
+                    matrix[i][j] /= MathF.Sqrt(_config.EmbeddingSize);
                     continue;
                 }
 
-                matrix[i][j] = double.NegativeInfinity;
+                matrix[i][j] = float.NegativeInfinity;
             }
         }
     }
     
-    public double[][] SoftmaxEachRow(double[][] matrix)
+    public float[][] SoftmaxEachRow(float[][] matrix)
     {
-        double[][] res = new double[matrix.Length][];
+        float[][] res = new float[matrix.Length][];
         
         for (int i = 0; i < matrix.Length; i++)
         {
@@ -103,18 +103,18 @@ public class SelfAttentionLayer
         return res;
     }
     
-    public double[][] WeightedSum(double[][] attn, double[][] V)
+    public float[][] WeightedSum(float[][] attn, float[][] V)
     {
-        double[][] res = new double[attn.Length][];
+        float[][] res = new float[attn.Length][];
         
         for (int i = 0; i < attn.Length; i++) 
         {
-            double[] sumVector = new double[_config.EmbeddingSize];
+            float[] sumVector = new float[_config.EmbeddingSize];
             
             for (int j = 0; j < attn[i].Length; j++) 
             {
-                double weight = attn[i][j];
-                double[] valueVect = V[j];
+                float weight = attn[i][j];
+                float[] valueVect = V[j];
         
                 for (int k = 0; k < _config.EmbeddingSize; k++) 
                 {
