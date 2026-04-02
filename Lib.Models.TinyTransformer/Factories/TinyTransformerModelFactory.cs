@@ -1,4 +1,5 @@
-﻿using Lib.Models.TinyTransformer.Configuration;
+﻿using System.Text.Json;
+using Lib.Models.TinyTransformer.Configuration;
 using Lib.Models.TinyTransformer.State;
 
 namespace Lib.Models.TinyTransformer.Factories;
@@ -16,6 +17,23 @@ public class TinyTransformerModelFactory
 
     public static TinyTransformerModel CreateAuto(TinyTransformerConfig config)
     {
+        return new TinyTransformerModel(config);
+    }
+    
+    public static TinyTransformerModel FromPayload(JsonElement payload)
+    {
+        var options = new JsonSerializerOptions 
+        { 
+            PropertyNameCaseInsensitive = true 
+        };
+        
+        var config = payload.Deserialize<TinyTransformerConfig>(options);
+
+        if (config == null)
+        {
+            throw new InvalidOperationException("Failed to deserialize TinyTransformerConfig from payload");
+        }
+        
         return new TinyTransformerModel(config);
     }
 }

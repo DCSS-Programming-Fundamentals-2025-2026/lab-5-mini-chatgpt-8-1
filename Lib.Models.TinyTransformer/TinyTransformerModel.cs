@@ -19,4 +19,9 @@ public class TinyTransformerModel
     {
         _config = config;
     }
+    
+    public TinyTransformerConfig GetPayloadForCheckpoint()
+    { 
+        return _config;   
+    }
 }
