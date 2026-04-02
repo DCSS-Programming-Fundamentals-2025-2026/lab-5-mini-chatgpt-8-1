@@ -8,7 +8,7 @@ public class TinyTransformerModel
 {
     private readonly TinyTransformerConfig _config;
     private readonly MathOpsImpl _mathOps = new ();
-    public double[] NextTokenScores(int[] context)
+    public float[] NextTokenScores(int[] context)
     {
         TransformerBlock block = new TransformerBlock(_config);    
             

@@ -2,7 +2,7 @@
 
 public class MatrixHelper
 {
-    public static double[][] MultiplyMatrix(double[][] matrix, double[][] weights)
+    public static float[][] MultiplyMatrix(float[][] matrix, float[][] weights)
     {
 
         if (matrix[0].Length != weights.Length)
@@ -10,15 +10,15 @@ public class MatrixHelper
             throw new ArgumentException("Matrix dimensions do not match");
         }
         
-        double[][] res = new double[matrix.Length][];
+        float[][] res = new float[matrix.Length][];
 
         for (int i = 0; i < res.Length; i++)
         {
-            res[i] = new double[weights[0].Length];
+            res[i] = new float[weights[0].Length];
 
             for (int j = 0; j < res[i].Length; j++)
             {
-                double sum = 0;
+                float sum = 0;
 
                 for (int k = 0; k < matrix.Length; k++)
                 {
@@ -32,13 +32,13 @@ public class MatrixHelper
         return res;
     }
     
-    public static double[][] TransposeMatrix(double[][] matrix)
+    public static float[][] TransposeMatrix(float[][] matrix)
     {
-        double[][] res = new double[matrix[0].Length][];
+        float[][] res = new float[matrix[0].Length][];
 
         for (int i = 0; i < res.Length; i++)
         {
-            res[i] = new double[matrix.Length];
+            res[i] = new float[matrix.Length];
 
             for (int j = 0; j < res[i].Length; j++)
             {
@@ -49,7 +49,7 @@ public class MatrixHelper
         return res;
     }
 
-    public static void LineSumm(double[] line1 , double[] line2)
+    public static void LineSumm(float[] line1 , float[] line2)
     {
         if (line1.Length != line2.Length)
         {

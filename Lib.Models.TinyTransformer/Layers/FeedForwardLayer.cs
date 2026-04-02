@@ -13,21 +13,21 @@ public class FeedForwardLayer
         _config = config;
     }
 
-    public double[] Project(double[] hidden)
+    public float[] Project(float[] hidden)
     {
-        double[][] hiddenHelper = new double[1][];
+        float[][] hiddenHelper = new float[1][];
         hiddenHelper[0] = hidden;
 
-        double[][] firstLinear = Linear(hiddenHelper, LinearAction.Expanse);
+        float[][] firstLinear = Linear(hiddenHelper, LinearAction.Expanse);
         Relu(firstLinear[0]);
-        double[][] secondLinear = Linear(firstLinear, LinearAction.Compress);
+        float[][] secondLinear = Linear(firstLinear, LinearAction.Compress);
 
-        double[][] thirdLinear = Linear(secondLinear, LinearAction.Vocab);
+        float[][] thirdLinear = Linear(secondLinear, LinearAction.Vocab);
 
         return thirdLinear[0];
     }
 
-    public double[][] Linear(double[][] matrix, LinearAction linear)
+    public float[][] Linear(float[][] matrix, LinearAction linear)
     {
         switch (linear)
         {
@@ -50,7 +50,7 @@ public class FeedForwardLayer
         }
     }
 
-    public static void Relu(double[] array)
+    public static void Relu(float[] array)
     {
         for (int i = 0; i < array.Length; i++)
         {

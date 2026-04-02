@@ -4,7 +4,7 @@ namespace Lib.Models.TinyTransformer.Configuration;
 
 public class TinyTransformerConfig
 {
-    public double[][] TokenEmbeddings = [];
+    public float[][] TokenEmbeddings = [];
     public int VocabSize { get; set; }
     public int EmbeddingSize { get; set; }
     public int HeadCount { get; set; }
